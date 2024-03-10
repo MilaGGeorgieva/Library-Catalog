@@ -26,7 +26,7 @@ test("Verify Register buttnon is visible", async ( {page} ) => {
     expect(isRegisterButtonVisisble).toBe(true); 
 });
 
-test.only("Verify All Books link is visible after login", async ( {page} ) => {
+test("Verify All Books link is visible after login", async ( {page} ) => {
     //await page.goto(baseURL);
     //await page.waitForSelector("nav.navbar");
     //await page.click('a[href="/login"]');
@@ -35,7 +35,7 @@ test.only("Verify All Books link is visible after login", async ( {page} ) => {
     //await page.fill('input[name="email"]', 'peter@abv.bg');
     await page.fill('#email', "peter@abv.bg");
     await page.fill('#password', "123456");
-    await page.click('#login-form > fieldset > input');
+    await page.click('#login-form > fieldset > input');    
     
     const logoutButton = await page.$('#logoutBtn');
     const isLogoutButtonVisible = await logoutButton.isVisible();
