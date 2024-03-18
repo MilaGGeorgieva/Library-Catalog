@@ -1,6 +1,7 @@
 const { expect, test} = require('@playwright/test');
 const baseURL = "http://localhost:3000";
-const loginURL = "http://localhost:3000/login"
+const loginURL = "http://localhost:3000/login";
+const allBooksURL = "http://localhost:3000/catalog";
 
 test("Verify All Books link is visible", async ( {page} ) => {
     await page.goto(baseURL);
@@ -77,4 +78,28 @@ test("Verify User's email address is visible after login", async ( {page} ) => {
     const emailInfo = await page.$('#user > span');
     const isEmailInfoVisible = await emailInfo.isVisible();
     expect(isEmailInfoVisible).toBe(true);     
+});
+
+test("Login with valid credentials", async ( {page} ) => {
+    await page.goto(loginURL);    
+    await page.fill('#email', "peter@abv.bg");
+    await page.fill('#password', "123456");
+    await page.click('#login-form > fieldset > input');    
+    
+    await page.$('a[href="/catalog"]');
+    expect(page.url()).toBe(allBooksURL); 
+});
+
+test("Submit Login form with empty fields", async ( {page} ) => {
+    await page.goto(loginURL);        
+    await page.click('#login-form > fieldset > input');    
+    
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+    await page.$('a[href="/login"]');
+    expect(page.url()).toBe(loginURL);
 });
