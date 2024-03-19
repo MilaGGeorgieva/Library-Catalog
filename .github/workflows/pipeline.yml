@@ -1,0 +1,33 @@
+name: Build Test Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    #strategy:
+      #matrix:
+        #node-version: [14.x, 16.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v3
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - name: Install pakcage.json dependancies     
+      run: npm install
+    - name: Start backend
+      run: npm run start-be
+    - name: Start frontend
+      run: npm run start-fe
+    - name: Execute Playwright UI tests
+      run: npm run test-ui   
