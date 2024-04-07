@@ -1,6 +1,7 @@
 const { expect, test} = require('@playwright/test');
 const baseURL = "http://localhost:3000";
 const loginURL = "http://localhost:3000/login";
+const registerURL = "http://localhost:3000/register"
 const allBooksURL = "http://localhost:3000/catalog";
 
 test("Verify All Books link is visible", async ( {page} ) => {
@@ -36,7 +37,8 @@ test("Verify All Books link is visible after login", async ( {page} ) => {
     //await page.fill('input[name="email"]', 'peter@abv.bg');
     await page.fill('#email', "peter@abv.bg");
     await page.fill('#password', "123456");
-    await page.click('#login-form > fieldset > input');    
+    await page.click('#login-form > fieldset > input');
+    //await page.click('input[type="submit"]');    
     
     const logoutButton = await page.$('#logoutBtn');
     const isLogoutButtonVisible = await logoutButton.isVisible();
@@ -102,4 +104,59 @@ test("Submit Login form with empty fields", async ( {page} ) => {
 
     await page.$('a[href="/login"]');
     expect(page.url()).toBe(loginURL);
+});
+
+test("Submit login form with empty email field and valid password", async ( {page} ) => {
+    await page.goto(loginURL);
+    await page.fill('#password', "123456");
+    await page.click('#login-form > fieldset > input');
+
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+     await page.$('a[href="/login"]');
+     expect(page.url()).toBe(loginURL);
+});
+
+test("Submit login form with valid email and empty password field", async ( {page} ) => {
+    await page.goto(loginURL);
+    await page.fill('#email', "peter@abv.bg");
+    await page.click('#login-form > fieldset > input');
+
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+     await page.$('a[href="/login"]');
+     expect(page.url()).toBe(loginURL);
+});
+
+test("Register with valid values", async ( {page} ) => {
+    await page.goto(registerURL);    
+    await page.fill('#email', "anyuser@abv.bg");
+    await page.fill('#password', "1234567");
+    await page.fill('#repeat-pass', "1234567")
+    await page.click('#register-form > fieldset > input');    
+    
+    await page.$('a[href="/catalog"]');
+    expect(page.url()).toBe(allBooksURL); 
+});
+
+test("Submit Register form with empty fields", async ( {page} ) => {
+    await page.goto(registerURL);        
+    await page.click('#register-form > fieldset > input');    
+    
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+    await page.$('a[href="/register"]');
+    expect(page.url()).toBe(registerURL);
 });
