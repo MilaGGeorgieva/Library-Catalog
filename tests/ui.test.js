@@ -147,7 +147,7 @@ test("Register with valid values", async ( {page} ) => {
     expect(page.url()).toBe(allBooksURL); 
 });
 
-test("Submit REgister form with empty fields", async ( {page} ) => {
+test("Submit Register form with empty fields", async ( {page} ) => {
     await page.goto(registerURL);        
     await page.click('#register-form > fieldset > input');    
     
