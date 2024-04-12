@@ -138,7 +138,7 @@ test("Submit login form with valid email and empty password field", async ( {pag
 
 test("Register with valid values", async ( {page} ) => {
     await page.goto(registerURL);    
-    await page.fill('#email', "anyuser@abv.bg");
+    await page.fill('#email', "anyuser1@abv.bg");
     await page.fill('#password', "1234567");
     await page.fill('#repeat-pass', "1234567")
     await page.click('#register-form > fieldset > input');    
@@ -160,3 +160,69 @@ test("Submit Register form with empty fields", async ( {page} ) => {
     await page.$('a[href="/register"]');
     expect(page.url()).toBe(registerURL);
 });
+
+test("Submit Register form with empty email field and valid password fields", async ( {page} ) => {
+    await page.goto(registerURL);
+    await page.fill('#password', "1234567");
+    await page.fill('#repeat-pass', "1234567")
+    await page.click('#register-form > fieldset > input');
+
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+     await page.$('a[href="/register"]');
+     expect(page.url()).toBe(registerURL);
+});
+
+test("Submit Register form with valid email and empty password field", async ( {page} ) => {
+    await page.goto(registerURL);
+    await page.fill('#email', "anyuser2@abv.bg");    
+    await page.fill('#repeat-pass', "1234567")
+    await page.click('#register-form > fieldset > input');
+
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+     await page.$('a[href="/register"]');
+     expect(page.url()).toBe(registerURL);
+});
+
+test("Submit Register form with valid email and empty confirm password field", async ( {page} ) => {
+    await page.goto(registerURL);
+    await page.fill('#email', "anyuser3@abv.bg");
+    await page.fill('#password', "1234567");    
+    await page.click('#register-form > fieldset > input');
+
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain('All fields are required!');
+        await dialog.accept();
+    });
+
+     await page.$('a[href="/register"]');
+     expect(page.url()).toBe(registerURL);
+});
+
+test("Submit Register form with valid email and different passwords", async ( {page} ) => {
+    await page.goto(registerURL);
+    await page.fill('#email', "anyuser5@abv.bg");
+    await page.fill('#password', "1234567");
+    await page.fill('#repeat-pass', "12345678")   
+    await page.click('#register-form > fieldset > input');
+
+    page.on('dialog', async dialog => {
+        expect(dialog.type()).toContain('alert');
+        expect(dialog.message()).toContain("Passwords don't match!");
+        await dialog.accept();
+    });
+
+     await page.$('a[href="/register"]');
+     expect(page.url()).toBe(registerURL);
+});
+
