@@ -3,6 +3,7 @@ const baseURL = "http://localhost:3000";
 const loginURL = "http://localhost:3000/login";
 const registerURL = "http://localhost:3000/register"
 const allBooksURL = "http://localhost:3000/catalog";
+const uniqueEmail = () => `anyuser${Math.floor(Math.random() * 100000)}@example.com`;
 
 test("Verify All Books link is visible", async ( {page} ) => {
     await page.goto(baseURL);
@@ -138,7 +139,7 @@ test("Submit login form with valid email and empty password field", async ( {pag
 
 test("Register with valid values", async ( {page} ) => {
     await page.goto(registerURL);    
-    await page.fill('#email', "anyuser1@abv.bg");
+    await page.fill('#email', uniqueEmail());
     await page.fill('#password', "1234567");
     await page.fill('#repeat-pass', "1234567")
     await page.click('#register-form > fieldset > input');    
@@ -179,7 +180,7 @@ test("Submit Register form with empty email field and valid password fields", as
 
 test("Submit Register form with valid email and empty password field", async ( {page} ) => {
     await page.goto(registerURL);
-    await page.fill('#email', "anyuser2@abv.bg");    
+    await page.fill('#email', uniqueEmail());    
     await page.fill('#repeat-pass', "1234567")
     await page.click('#register-form > fieldset > input');
 
@@ -195,7 +196,7 @@ test("Submit Register form with valid email and empty password field", async ( {
 
 test("Submit Register form with valid email and empty confirm password field", async ( {page} ) => {
     await page.goto(registerURL);
-    await page.fill('#email', "anyuser3@abv.bg");
+    await page.fill('#email', uniqueEmail());
     await page.fill('#password', "1234567");    
     await page.click('#register-form > fieldset > input');
 
@@ -211,7 +212,7 @@ test("Submit Register form with valid email and empty confirm password field", a
 
 test("Submit Register form with valid email and different passwords", async ( {page} ) => {
     await page.goto(registerURL);
-    await page.fill('#email', "anyuser5@abv.bg");
+    await page.fill('#email', uniqueEmail());
     await page.fill('#password', "1234567");
     await page.fill('#repeat-pass', "12345678")   
     await page.click('#register-form > fieldset > input');
@@ -226,3 +227,26 @@ test("Submit Register form with valid email and different passwords", async ( {p
      expect(page.url()).toBe(registerURL);
 });
 
+test("Add book with correct data", async ( {page} ) => {
+    await page.goto(loginURL);    
+    await page.fill('#email', "peter@abv.bg");
+    await page.fill('#password', "123456");
+        
+    
+    await Promise.all([
+        page.click('#login-form > fieldset > input'),
+        page.waitForURL(allBooksURL)
+    ]);
+    
+     await page.click('a[href="/create"]');
+     await page.waitForSelector('#create-form');
+
+     await page.fill('#title', "MagicTestBook");
+     await page.fill('#description', "This is a test book description");
+     await page.fill('#image', "https://example.com/book-image.jpg");
+     await page.selectOption('#type', "Fiction");
+     await page.click('#create-form > fieldset > input');
+
+     await page.waitForURL(allBooksURL);
+     expect(page.url()).toBe(allBooksURL);
+});
